@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="tl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WinS Monitoring Tracker</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--tx:#1d1d1b;--mut:#6b6a66;--ln:#e2e0da;--ac:#233a6b;--acbg:#e8edf8;--no:#a32d2d;--nobg:#fcebeb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171716;--card:#232321;--tx:#f0efe9;--mut:#a3a29b;--ln:#3a3a37;--ac:#8fb0ff;--acbg:#16223f;--no:#f09595;--nobg:#4a1b1b;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:14px 14px 50px}
+h1{font-size:20px;margin:6px 0 2px}h2{font-size:16px;margin:14px 0 8px}
+.sub,.prog,.lbl{color:var(--mut);font-size:13px}.lbl{margin:0 0 6px}.prog{margin:4px 2px 10px}
+.tabs{display:flex;gap:5px;margin:10px 0}
+.tabs button{flex:1;padding:9px 1px;font-size:13px;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:10px;font-size:14px}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:9px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row:has(.seg button[data-i="hw"]){flex-wrap:wrap}
+.q small{display:block;color:var(--mut);font-size:12px}
+.seg{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+button.b,.seg button{padding:9px 11px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:9px;font-size:14px}
+.seg button.y.on{background:var(--acbg);border-color:var(--ac);color:var(--ac);font-weight:600}
+.seg button.n.on{background:var(--nobg);border-color:var(--no);color:var(--no);font-weight:600}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--ln);border-radius:9px;background:var(--bg);color:var(--tx);font:inherit}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.proof{margin-top:10px;padding-top:10px;border-top:1px dashed var(--ln)}
+.cam{display:inline-block;padding:9px 11px;border-radius:9px;background:var(--ac);color:#fff;font-size:14px;margin-top:6px}
+.cam input{display:none}
+.th{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.th img,.big{border-radius:8px;border:1px solid var(--ln)}.th img{width:64px;height:64px;object-fit:cover}.big{width:100%;max-height:340px;object-fit:contain;margin-top:8px}
+.bar{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--ac)}
+.sug{margin-top:6px;font-size:14px;background:var(--acbg);color:var(--ac);padding:6px 9px;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{border:1px solid var(--ln);padding:6px;text-align:center}th{background:var(--bg)}
+.tag{font-size:12px;padding:2px 7px;border-radius:6px;background:var(--nobg);color:var(--no)}.tag.ok{background:var(--acbg);color:var(--ac)}
+.pr{display:none}.ob{display:block;width:100%;text-align:left;margin-bottom:6px}.rq{padding:6px 0;border-bottom:1px solid var(--ln);font-size:14px}
+body{background:linear-gradient(180deg,var(--acbg) 0,var(--bg) 240px) no-repeat,var(--bg)}
+.hero{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0f1b3d,#2f5bb7);color:#fff;border-radius:18px;padding:16px;margin:4px 0 6px;box-shadow:0 6px 18px rgba(35,58,107,.28)}
+.hero h1{margin:0;font-size:21px}.hero .sub{color:#dbe6ff}.lg{font-size:30px;background:rgba(255,255,255,.2);border-radius:14px;padding:6px 10px}
+.card,.tile{border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.tabs button{border-radius:12px;font-weight:600}.tabs button.on{box-shadow:0 3px 10px rgba(35,58,107,.32)}
+button{cursor:pointer;transition:transform .08s}button:active{transform:scale(.97)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:9px}
+.tile{background:var(--card);border:1px solid var(--ln);padding:10px 6px;text-align:center}
+.tile b{display:block;font-size:22px;color:var(--ac)}.tile span{font-size:11px;color:var(--mut)}.tile small{display:block;font-size:10px;color:var(--mut);margin-top:3px;line-height:1.25}
+.chart{display:flex;justify-content:center;gap:6px;align-items:flex-end;height:160px;margin-top:8px}
+.col{flex:1;max-width:96px;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;min-width:0}
+.col em{font-style:normal;font-size:11px;font-weight:600}.col small{font-size:10px;color:var(--mut);margin-top:3px;white-space:nowrap}
+.bw{width:100%;flex:1;display:flex;align-items:flex-end;background:var(--ln);border-radius:8px;overflow:hidden;margin-top:3px}.bw i{display:block;width:100%}
+.fh{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.ft{font-weight:700;font-size:14px;margin-bottom:6px}.fi{font-size:12px;opacity:.92;padding:2px 0}
+.fs{background:var(--acbg);color:var(--ac);border-left:4px solid var(--ac);padding:6px 10px;border-radius:8px;font-size:14px;margin:14px 0 6px}
+.fr{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--ln);font-size:13.5px}
+.qn{flex:0 0 30px;height:22px;border-radius:7px;background:var(--acbg);color:var(--ac);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center}
+.qt{flex:1;line-height:1.35}.qa{flex:0 0 auto;max-width:38%;font-weight:700;color:var(--ac);text-align:right}.qa.e{color:var(--mut);font-weight:400}
+@media print{
+@page{size:portrait;margin:12mm}
+.tabs,.noprint,button,.cam{display:none!important}
+html,body{background:#fff!important;color:#000!important}
+body{font-size:11px;line-height:1.35}
+main{max-width:none;margin:0;padding:0}
+h1{font-size:16px;margin:0}
+h2{font-size:13px;margin:10px 0 4px;break-after:avoid}
+.card{break-inside:avoid;background:#fff;border-color:#bbb}
+.card.rep{break-inside:auto;border:0;padding:0;margin:0;}
+.card.rep .rq{break-inside:avoid;padding:3px 0;font-size:11.5px;border-bottom:1px solid #ccc}
+.card.rep h2{margin:8px 0 3px;border-bottom:1.5px solid #000;padding-bottom:2px}
+.pr{display:block}.hero{background:#fff!important;color:#000!important;box-shadow:none;padding:0}.hero .sub{color:#555}.lg{display:none}.fh{padding:8px 10px;margin-bottom:6px}.fr{font-size:11px;padding:3px 0;break-inside:avoid}.fs{font-size:12px;margin:8px 0 3px}.card.rep h2.fs{border-bottom:0;padding:4px 8px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.pdfx,.pdfx *{box-sizing:border-box}.pdfh{padding-bottom:8px;margin-bottom:10px;border-bottom:2px solid #233a6b}.pdfh b{font-size:20px;display:block}.pdfh span{color:#666;font-size:13px}.pdfx .tile{padding:8px 4px}.pdfx .tile b{font-size:19px}.pdfx .chart{height:130px}.pdfx{width:720px;background:#fff!important;color:#111!important;padding:10px;--card:#fff;--ln:#ddd;--ac:#233a6b;--acbg:#e8edf8;--mut:#666;--no:#a32d2d}.pdfx .pr{display:block}.pdfx .noprint,.pdfx button{display:none!important}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></head><body><main>
+<div class="hero"><div class="lg">🚿</div><div><h1>WinS Monitoring Tracker</h1><div class="sub">Potrero Elementary School</div></div></div>
+<div class="tabs noprint"><button data-t="1" class="on">Linggo</button><button data-t="2">Facilities</button><button data-t="3">Proof</button><button data-t="4">Buod</button><button data-t="5">Form</button></div>
+<div id="v"></div></main>
+<script>
+var G=[{k:'dw',q:'May inuming tubig buong linggo',s:'Q1'},{k:'hw',q:'Tubig para sa handwashing at CR',s:'Q7',w:1},{k:'sp',q:'May sabon sa handwashing areas buong linggo',s:'Q35'},{k:'tb',q:'May takip na basurahan, naka-segregate',s:'Q16'},{k:'cl',q:'Nilinis ang mga CR ngayong linggo',s:'Q14'},{k:'gc',q:'Nakolekta ang basura ngayong linggo',s:'Q19'},{k:'sw',q:'Walang stagnant water, maayos ang drainage',s:'Q24, Q26'},{k:'gh',q:'Nagkaroon ng group handwashing with soap ngayong linggo',s:'Q32'},{k:'gt',q:'Nagkaroon ng group toothbrushing with fluoride ngayong linggo',s:'Q38'}];
+var S={fac:[],days:{},issues:[]},tab=1,cur=wk(iso(new Date())),range='week',pw='all',mem={},db=null;
+function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(x<10?'0':'')+x}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function load(){try{S=JSON.parse(localStorage.getItem('wins2')||'')||S}catch(e){}S.fac=S.fac||[];S.days=S.days||{};S.issues=S.issues||[]}
+function save(){try{localStorage.setItem('wins2',JSON.stringify(S))}catch(e){}}
+function day(){return S.days[cur]||(S.days[cur]={g:{},f:{}})}
+function idb(cb){if(db)return cb(db);try{var r=indexedDB.open('wins_photos',1);r.onupgradeneeded=function(){r.result.createObjectStore('p')};r.onsuccess=function(){db=r.result;cb(db)};r.onerror=function(){cb(null)}}catch(e){cb(null)}}
+function putP(id,d,cb){mem[id]=d;idb(function(x){if(!x)return cb();try{var t=x.transaction('p','readwrite');t.objectStore('p').put(d,id);t.oncomplete=cb;t.onerror=cb}catch(e){cb()}})}
+function getP(id,cb){if(mem[id])return cb(mem[id]);idb(function(x){if(!x)return cb(null);try{var q=x.transaction('p').objectStore('p').get(id);q.onsuccess=function(){cb(q.result)};q.onerror=function(){cb(null)}}catch(e){cb(null)}})}
+function delP(id){delete mem[id];idb(function(x){try{if(x)x.transaction('p','readwrite').objectStore('p').delete(id)}catch(e){}})}
+function fill(){[].forEach.call(document.querySelectorAll('img[data-p]'),function(im){getP(im.getAttribute('data-p'),function(d){if(d)im.src=d})})}
+function shrink(file,cb){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var m=900,s=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7))};im.src=fr.result};fr.readAsDataURL(file)}
+function seg(a,id,v,yes,no){return '<div class="seg"><button class="y '+(v===1?'on':'')+'" data-a="'+a+'" data-i="'+id+'" data-v="1">'+(yes||'Oo')+'</button><button class="n '+(v===0?'on':'')+'" data-a="'+a+'" data-i="'+id+'" data-v="0">'+(no||'Hindi')+'</button></div>'}
+function prevWeek(){var best=null;Object.keys(S.days).forEach(function(d){var X=S.days[d];if(d<cur&&(Object.keys(X.g||{}).length||Object.keys(X.f||{}).length)&&(!best||d>best))best=d});return best}
+function cseg(k,v){var h='<div class="seg">';for(var n=0;n<=5;n++)h+='<button class="y '+(v===n?'on':'')+'" data-a="g" data-i="'+k+'" data-v="'+n+'">'+n+'</button>';return h+'</div>'}
+function issuesFor(d,f){return S.issues.filter(function(i){return i.date===d&&i.fid===f})}
+function sexL(s){return s==='M'?'Lalaki':s==='F'?'Babae':'Shared'}
+function viewNow(){
+ var D=day(),h='<div class="card"><p class="lbl">Linggo (pumili ng kahit anong araw sa linggo)</p><input type="date" id="dt" value="'+cur+'"><div class="sug">'+wl(cur)+'</div>'+(prevWeek()?'<button class="b p noprint" style="margin-top:8px;width:100%" data-a="cp">\ud83d\udccb Kopyahin ang sagot ng '+wl(prevWeek())+'</button><p class="lbl" style="margin:6px 0 0">Ang mga wala pang sagot lang ang pupunan. Baguhin mo na lang ang nag-iba.</p>':'')+'</div>';
+ if(!S.fac.length)h+='<div class="card">Wala pang nakalistang CR o handwashing facility. Pumunta sa tab na Facilities.</div>';
+ var cr=S.fac.filter(function(f){return f.kind==='cr'}),hw=S.fac.filter(function(f){return f.kind==='hw'});
+ function block(list,title,q,y,n){if(!list.length)return;h+='<h2>'+title+'</h2>';list.forEach(function(f){var v=D.f[f.id];
+  h+='<div class="card"><div class="row"><div class="q">'+esc(f.name)+'<small>'+(f.kind==='cr'?sexL(f.sex)+' · '+f.seats+' seat':(f.group?'Group':'Individual')+' · '+f.outlets+' outlet')+' · '+q+'</small></div>'+seg('f',f.id,v,y,n)+'</div>';
+  if(v===0){var is=issuesFor(cur,f.id);h+='<div class="proof"><input id="n_'+f.id+'" placeholder="Ano ang problema? (madumi, sira, walang tubig...)"><label class="cam">📷 Kunan ng proof<input type="file" accept="image/*" capture="environment" data-a="ph" data-i="'+f.id+'"></label> <button class="b" data-a="nt" data-i="'+f.id+'">Tala lang</button>';
+   if(is.length)h+='<div class="th">'+is.map(function(i){return i.photo?'<img data-p="'+i.photo+'" alt="proof">':'<span class="tag">'+esc(i.note||'tala')+'</span>'}).join('')+'</div>';h+='</div>'}
+  h+='</div>'})}
+ block(cr,'Mga CR','Malinis ba buong linggo?','Malinis','Madumi');block(hw,'Handwashing','Gumagana (may tubig/sabon) buong linggo?','Oo','Hindi');
+ h+='<h2>Pangkalahatan</h2>';
+ G.forEach(function(g){var v=D.g[g.k];h+='<div class="card"><div class="row"><div class="q">'+g.q+'<small>'+g.s+'</small></div>'+(g.c?cseg(g.k,v):g.w?'<div class="seg"><button class="y '+(v==='24'?'on':'')+'" data-a="g" data-i="hw" data-v="24">24h araw-araw</button><button class="y '+(v==='p'?'on':'')+'" data-a="g" data-i="hw" data-v="p">Ilang oras</button><button class="n '+(v==='0'?'on':'')+'" data-a="g" data-i="hw" data-v="0">Ilang araw</button></div>':seg('g',g.k,v))+'</div></div>'});
+ return h}
+function viewFac(){
+ var h='<div class="card"><p class="lbl">Magdagdag ng CR (Q8)</p><input id="cn" placeholder="Pangalan (hal. CR Grade 1 Babae)"><div class="g" style="margin-top:8px"><select id="cs"><option value="F">Babae</option><option value="M">Lalaki</option><option value="S">Shared</option></select><input id="cq" type="number" min="1" value="1" placeholder="Ilang toilet seat"></div><button class="b p" data-a="addcr">Idagdag</button></div>';
+ h+='<div class="card"><p class="lbl">Magdagdag ng handwashing facility (Q34)</p><input id="hn" placeholder="Pangalan (hal. Handwashing area A)"><div class="g" style="margin-top:8px"><select id="hg"><option value="1">Group</option><option value="0">Individual</option></select><input id="ho" type="number" min="1" value="10" placeholder="Ilang gripo/outlet"></div><button class="b p" data-a="addhw">Idagdag</button></div>';
+ S.fac.forEach(function(f){h+='<div class="card"><div class="row"><div class="q">'+esc(f.name)+'<small>'+(f.kind==='cr'?'CR · '+sexL(f.sex)+' · '+f.seats+' seat':'Handwashing · '+(f.group?'Group':'Individual')+' · '+f.outlets+' outlet')+'</small></div><div class="seg">'+(f.kind==='cr'?'<button class="y '+(f.func===false?'':'on')+'" data-a="fn" data-i="'+f.id+'" data-v="1">\u2713 Gumagana</button><button class="n '+(f.func===false?'on':'')+'" data-a="fn" data-i="'+f.id+'" data-v="0">\u2717 Sira</button>':'')+'<button class="b" data-a="del" data-i="'+f.id+'">Burahin</button></div></div></div>'});
+ return h}
+function viewProof(){
+ var h='<div class="pr"><h2>WinS Proof of Monitoring — Potrero Elementary School</h2></div><div class="pr">'+statsH()+'</div><div class="noprint"><button class="b p" data-a="print">\ud83d\udda8 I-print</button> <button class="b p" data-a="pdf">\u2b07 I-download bilang PDF</button></div><h2>Mga isyu at proof</h2>';
+ if(!S.issues.length)return h+'<div class="card">Wala pang naka-log. Lalabas dito ang mga naka-photo kapag may minarkahan kang Madumi o Hindi gumagana.</div>';
+ var ws=[];S.issues.forEach(function(i){var k=wk(i.date);if(ws.indexOf(k)<0)ws.push(k)});ws.sort().reverse();if(pw!=='all'&&ws.indexOf(pw)<0)pw='all';
+ h+='<div class="card noprint"><p class="lbl">Linggo</p><select id="pw"><option value="all"'+(pw==='all'?' selected':'')+'>Lahat ng linggo</option>'+ws.map(function(w){return '<option value="'+w+'"'+(pw===w?' selected':'')+'>'+wl(w)+'</option>'}).join('')+'</select></div>';
+ var lw='';S.issues.slice().sort(function(a,b){return a.date<b.date?1:-1}).forEach(function(i){var wkk=wk(i.date);if(pw!=='all'&&pw!==wkk)return;if(wkk!==lw){h+='<h2>'+wl(wkk)+'</h2>';lw=wkk}var f=S.fac.filter(function(x){return x.id===i.fid})[0];
+  h+='<div class="card"><div class="row"><div class="q"><b>'+esc(f?f.name:'(nabura na)')+'</b><small>'+i.date+'</small></div><span class="tag '+(i.res?'ok':'')+'">'+(i.res?'Naayos':'Bukas pa')+'</span></div>'+(i.note?'<p style="margin:8px 0 0">'+esc(i.note)+'</p>':'')+(i.photo?'<img class="big" data-p="'+i.photo+'" alt="proof">':'')+'<div class="seg noprint" style="margin-top:8px;justify-content:flex-start"><button class="b" data-a="res" data-i="'+i.id+'">'+(i.res?'Ibalik bilang bukas':'Markahang naayos')+'</button><button class="b" data-a="di" data-i="'+i.id+'">Burahin</button></div></div>'});
+ return h}
+function wl(w){var M=['Ene','Peb','Mar','Abr','May','Hun','Hul','Ago','Set','Okt','Nob','Dis'],a=new Date(w+'T00:00:00'),b=new Date(a);b.setDate(b.getDate()+6);return 'Linggo ng '+M[a.getMonth()]+' '+a.getDate()+(a.getMonth()!==b.getMonth()?' \u2013 '+M[b.getMonth()]+' '+b.getDate():' \u2013 '+b.getDate())+', '+b.getFullYear()}
+function wk(d){var t=new Date(d+'T00:00:00');t.setDate(t.getDate()-(t.getDay()+6)%7);return iso(t)}
+function wScore(D){var y=0,t=0;G.forEach(function(g){var v=D.g[g.k];if(v===undefined)return;t++;if(g.w?v==='24':v===1)y++});Object.keys(D.f||{}).forEach(function(k){t++;if(D.f[k]===1)y++});return t?Math.round(y/t*100):null}
+function tl(a){var y=0,t=0;a.forEach(function(v){t++;if(v)y++});return {y:y,t:t}}
+function statsH(){var W={};DK().forEach(function(d){var c=wScore(S.days[d]);if(c===null)return;var k=wk(d);(W[k]=W[k]||[]).push(c)});
+ var ks=Object.keys(W).sort().slice(-8),sm2=function(a){return a.reduce(function(x,y){return x+y},0)},sc=ks.map(function(k){return Math.round(sm2(W[k])/W[k].length)});
+ if(!sc.length&&!S.fac.length&&!S.issues.length)return '';
+ var P=Object.keys(S.days).filter(function(d){return fmo?d.slice(0,7)===fmo:wk(d)===cur}).sort(),per=fmo?mon(fmo):wl(cur).replace('Linggo ng ','Linggo: ');
+ var M={};P.forEach(function(d){var k=wk(d),X=S.days[d];M[k]=M[k]||{g:{},f:{}};Object.keys(X.g||{}).forEach(function(q){M[k].g[q]=X.g[q]});Object.keys(X.f||{}).forEach(function(q){M[k].f[q]=X.f[q]})});
+ var td=iso(new Date()),exp=0;
+ if(fmo){var E={},y=+fmo.slice(0,4),mo=+fmo.slice(5,7)-1,dt=new Date(y,mo,1);while(dt.getMonth()===mo){if(iso(dt)<=td)E[wk(iso(dt))]=1;dt.setDate(dt.getDate()+1)}exp=Object.keys(E).length}else exp=cur<=td?1:0;
+ var nW=Math.max(1,exp),hwf=S.fac.filter(function(f){return f.kind==='hw'}),ansC=0,wa=[0,0],ha=[0,0];
+ Object.keys(M).forEach(function(k){var g=M[k].g,f=M[k].f;
+  G.forEach(function(q){if(g[q.k]!==undefined)ansC++});S.fac.forEach(function(x){if(f[x.id]!==undefined)ansC++});
+  if(g.dw!==undefined)wa[g.dw===1?0:1]++;if(g.hw!==undefined)wa[g.hw==='24'?0:1]++;
+  if(g.sp!==undefined)ha[g.sp===1?0:1]++;if(g.gh!==undefined)ha[g.gh===1?0:1]++;
+  hwf.forEach(function(x){if(f[x.id]!==undefined)ha[f[x.id]===1?0:1]++})});
+ var Rwat=2*nW,Rhw=(2+hwf.length)*nW,Rall=(G.length+S.fac.length)*nW,wu=Math.max(0,Rwat-wa[0]-wa[1]),hu=Math.max(0,Rhw-ha[0]-ha[1]);
+ function cnt(a,u){return a[0]+' OK \u00b7 '+a[1]+' hindi OK \u00b7 '+u+' walang sagot'}
+ var cr=S.fac.filter(function(f){return f.kind==='cr'}),fn=cr.filter(function(f){return f.func!==false}).length,op=S.issues.filter(function(i){return !i.res}).length;
+ var rs=S.issues.filter(function(i){var d=i.res?(i.rd||i.date):'';return d&&(fmo?d.slice(0,7)===fmo:wk(d)===cur)}).length;
+ var ND='No data available',WN='var(--no)';
+ function tile(n,l,sub,c,sm){return '<div class="tile"><b style="'+(c?'color:'+c+';':'')+(sm?'font-size:15px;line-height:30px':'')+'">'+n+'</b><span>'+l+'</span><small>'+sub+'</small></div>'}
+ var h='<h2>\ud83d\udcca Statistics</h2><p class="lbl" style="margin:0 0 6px">'+per+'</p><div class="tiles">'
+ +(wa[0]+wa[1]?tile(wu>0?'Incomplete':wa[0]===Rwat?'Available':wa[0]===0?'Not Available':'Partially Available','Water Availability',cnt(wa,wu)+' (Q1, Q7)',wa[1]?WN:'',1):tile(ND,'Water Availability','Sagutan ang Q1 at Q7','',1))
+ +(ha[0]+ha[1]?tile(hu>0?ha[0]+'/'+Rhw+' OK':Math.round(ha[0]/Rhw*100)+'%','Handwashing Compliance',cnt(ha,hu)+(hwf.length?'':' \u00b7 Q34 N/A'),ha[1]?WN:''):tile(ND,'Handwashing Compliance','Q32, Q34, Q35','',1))
+ +(fmo||exp?tile(ansC+'/'+Rall,'Response Completeness',Rall-ansC>0?(Rall-ansC)+' tanong ang walang sagot pa':'kumpleto lahat ng sagot',''):tile(ND,'Response Completeness','Hindi pa nagsisimula ang linggong ito','',1))
+ +(cr.length?tile(fn+'/'+cr.length,'CR na gumagana','mula sa Facilities',fn<cr.length?WN:''):tile(ND,'CR na gumagana','Magdagdag sa Facilities','',1))
+ +tile(op,'Pending Issues','hindi pa naayos',op?WN:'')
+ +tile(rs,'Resolved Issues','naayos '+(fmo?'ngayong buwan':'ngayong linggo'),'')+'</div>';
+ if(sc.length)h+='<div class="card"><p class="lbl">Weekly WinS Compliance Trend (% ng Oo / Malinis sa mga nasagot)</p><div class="chart">'+sc.map(function(v,i){return '<div class="col"><em>'+v+'%</em><div class="bw"><i style="height:'+v+'%;background:'+(v>=80?'var(--ac)':v>=50?'#e0a030':'var(--no)')+'"></i></div><small>'+wl(ks[i]).split(' \u2013')[0].slice(10)+'</small></div>'}).join('')+'</div>'+(sc.length<2?'<p class="lbl" style="margin:8px 0 0">Isang linggo pa lang ang may sagot. Kailangan pa ng mas maraming linggo ng monitoring para makita ang trend.</p>':'')+'</div>';
+ else h+='<div class="card"><p class="lbl" style="margin:0">Weekly WinS Compliance Trend: '+ND+'</p></div>';
+ return h}
+function viewSum(){
+ var crs=S.fac.filter(function(f){return f.kind==='cr'}),hws=S.fac.filter(function(f){return f.kind==='hw'});
+ function n(sex,fn){return crs.filter(function(f){return f.sex===sex&&(f.func!==false)===fn}).reduce(function(a,f){return a+Number(f.seats||0)},0)}
+ var h='<div class="noprint"><button class="b p" data-a="print">\ud83d\udda8 I-print</button> <button class="b p" data-a="pdf">\u2b07 I-download bilang PDF</button></div>'+statsH()+'<h2>Q8 · Toilet seats</h2><div class="card"><table><tr><th></th><th>Lalaki</th><th>Babae</th><th>Shared</th><th>Total</th></tr>';
+ [[true,'Functional'],[false,'Not functional']].forEach(function(r){var a=n('M',r[0]),b=n('F',r[0]),c=n('S',r[0]);h+='<tr><th>'+r[1]+'</th><td>'+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+(a+b+c)+'</td></tr>'});
+ h+='</table></div><h2>Q34 · Handwashing facilities</h2><div class="card"><table><tr><th></th><th>Ilan</th><th>Total outlets</th></tr>';
+ [[0,'Individual'],[1,'Group']].forEach(function(r){var l=hws.filter(function(f){return !!f.group===!!r[0]});h+='<tr><th>'+r[1]+'</th><td>'+l.length+'</td><td>'+l.reduce(function(a,f){return a+Number(f.outlets||0)},0)+'</td></tr>'});
+ h+='</table></div><h2>Mga linggo</h2><div class="card"><p class="lbl">Saklaw</p><select id="rg"><option value="week"'+(range==='week'?' selected':'')+'>Linggong ito</option><option value="month"'+(range==='month'?' selected':'')+'>Buwang ito</option><option value="all"'+(range==='all'?' selected':'')+'>Lahat</option></select></div>';
+ var now=iso(new Date()),days=Object.keys(S.days).filter(function(d){return range==='week'?wk(d)===wk(now):range==='month'?d.slice(0,7)===now.slice(0,7):true}).sort();
+ if(!days.length)return h+'<div class="card">Wala pang naka-log sa saklaw na ito.</div>';
+ var wks={};days.forEach(function(d){wks[wk(d)]=1});var nw=Math.max(1,Object.keys(wks).length);
+ h+='<div class="prog">'+nw+' linggo · '+S.issues.filter(function(i){return !i.res}).length+' isyung bukas pa</div>';
+ function card(q,s,yes,tot,sug,w){var p=tot?Math.round(yes/tot*100):0;return '<div class="card"><div class="row"><div class="q">'+q+'<small>'+s+'</small></div><b>'+p+'%</b></div><div class="bar"><i style="width:'+p+'%"></i></div>'+(sug?'<div class="sug">'+sug+'</div>':'')+'</div>'}
+ var cy=0,ct=0;days.forEach(function(d){var v=S.days[d].f||{},ids=crs.map(function(f){return v[f.id]}).filter(function(x){return x!==undefined});if(ids.length){ct++;if(ids.indexOf(0)<0)cy++}});
+ var pw=(cy/nw).toFixed(1),pc=ct?cy/ct*100:0;
+ h+=card('Malinis ang lahat ng CR','mga linggong walang Madumi',cy,ct,'');
+ G.forEach(function(g){if(g.c){var vs=[];days.forEach(function(d){var v=S.days[d].g[g.k];if(typeof v==='number')vs.push(v)});var av=vs.length?vs.reduce(function(a,b){return a+b},0)/vs.length:0,sg=g.k==='cl'?(av>=4.5?'Daily':av>=2?'At least twice a week':av>=1?'Once a week':'Less than once a week'):g.k==='gc'?(av>=4.5?'Daily':av>=2?'2-3 times a week':av>=1?'Once a week':av>0?'Less than once a week':'No Collection'):'mga '+Math.round(av)+' beses kada linggo';h+='<div class="card"><div class="row"><div class="q">'+g.q+'<small>'+g.s+'</small></div><b>'+(vs.length?av.toFixed(1)+'\u00d7':'\u2014')+'</b></div><div class="bar"><i style="width:'+Math.min(100,av/5*100)+'%"></i></div>'+(vs.length?'<div class="sug">'+g.s+': '+sg+'</div>':'')+'</div>';return}
+  var y=0,t=0,w=0,p=0;days.forEach(function(d){var v=S.days[d].g[g.k];if(v===undefined)return;t++;if(g.w){if(v==='24')y++;else if(v==='p')p++}else if(v===1)y++});
+  var pw2=(y/nw).toFixed(1),pc2=t?y/t*100:0,s='';
+  if(g.k==='dw')s=pc2===100?'Q1: All the time':'Q1: Yes, but supply is not regular';
+  else if(g.k==='sp')s='Q35: '+(pc2>=90?'Yes':'No')+' (regular supply)';
+  else if(g.w)s='24h araw-araw: '+y+' · Ilang oras: '+p+' · Ilang araw: '+(t-y-p);
+  h+=card(g.q,g.s,y,t,s)});
+ return h+'<div class="prog">Suhestiyon lang ito mula sa mga log. Ikaw pa rin ang magpapasya sa isasagot sa form.</div>'}
+function draw(){var v=document.getElementById('v');v.innerHTML=tab===1?viewNow():tab===2?viewFac():tab===3?viewProof():tab===5?viewForm():viewSum();
+ [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.className=+b.getAttribute('data-t')===tab?'on':''});fill()}
+function addIssue(fid,photo){var el=document.getElementById('n_'+fid);S.issues.push({id:uid(),date:cur,fid:fid,note:el?el.value:'',photo:photo||null,res:false});save();draw()}
+document.addEventListener('click',function(e){
+ var t=e.target.closest('.tabs button');if(t){tab=+t.getAttribute('data-t');draw();return}
+ var b=e.target.closest('button[data-a]');if(!b)return;var a=b.getAttribute('data-a'),i=b.getAttribute('data-i'),v=b.getAttribute('data-v');
+ if(a==='f'){var D=day(),n=+v;if(D.f[i]===n)delete D.f[i];else D.f[i]=n;save();draw()}
+ else if(a==='g'){var D2=day(),val=i==='hw'?v:+v;if(D2.g[i]===val)delete D2.g[i];else D2.g[i]=val;save();draw()}
+ else if(a==='nt'){addIssue(i,null)}
+ else if(a==='addcr'){var nm=document.getElementById('cn').value.trim();if(!nm)return;S.fac.push({id:uid(),kind:'cr',name:nm,sex:document.getElementById('cs').value,seats:+document.getElementById('cq').value||1,func:true});save();draw()}
+ else if(a==='addhw'){var hn=document.getElementById('hn').value.trim();if(!hn)return;S.fac.push({id:uid(),kind:'hw',name:hn,group:document.getElementById('hg').value==='1',outlets:+document.getElementById('ho').value||1});save();draw()}
+ else if(a==='fn'){S.fac.forEach(function(f){if(f.id===i)f.func=(v==='1');});save();draw()}
+ else if(a==='del'){S.fac=S.fac.filter(function(f){return f.id!==i});save();draw()}
+ else if(a==='res'){S.issues.forEach(function(x){if(x.id===i)x.res=!x.res;x.rd=x.res?iso(new Date()):null});save();draw()}
+ else if(a==='di'){S.issues=S.issues.filter(function(x){if(x.id===i&&x.photo)delName(x.photo);return x.id!==i});save();draw()}
+ else if(a==='cp'){var pv=prevWeek();if(pv){var P=S.days[pv],D3=day();Object.keys(P.g||{}).forEach(function(k){if(D3.g[k]===undefined)D3.g[k]=P.g[k]});Object.keys(P.f||{}).forEach(function(k){if(D3.f[k]===undefined&&S.fac.some(function(x){return x.id===k}))D3.f[k]=P.f[k]});save();draw()}}
+ else if(a==='print'){try{window.print()}catch(er){}}
+ else if(a==='pdf'){var fb=function(){if(!window._pt){window._pt=1;alert('Walang internet kaya hindi ma-download nang diretso. Sa Printer, piliin ang "Save as PDF", tapos pindutin ang Save.')}try{window.print()}catch(er){}};
+  if(!window.html2pdf){fb()}else{var bx=document.createElement('div');bx.className='pdfx';bx.innerHTML='<div class="pdfh"><b>WinS Monitoring Tracker</b><span>Potrero Elementary School</span></div>'+document.getElementById('v').innerHTML;
+   var nm='WinS_'+(tab===5?(fper==='m'?'Monthly_'+(fmv||cur.slice(0,7)):'Weekly_'+cur):tab===3?'Proof_'+cur:'Buod_'+cur)+'.pdf';
+   window.html2pdf().set({margin:8,filename:nm,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['.fr','.tile','.card','.fs']}}).from(bx).save().then(function(){bx.remove()},function(){bx.remove();fb()})}}
+});
+function delName(p){delP(p)}
+document.addEventListener('change',function(e){var t=e.target;
+ if(t.id==='dt'){cur=wk(t.value||cur);draw()}else if(t.id==='rg'){range=t.value;draw()}else if(t.id==='pw'){pw=t.value;draw()}
+ else if(t.getAttribute('data-a')==='ph'&&t.files&&t.files[0]){var fid=t.getAttribute('data-i');shrink(t.files[0],function(d){var pid=uid();putP(pid,d,function(){addIssue(fid,pid)})})}
+});
+load();S.form=S.form||{h:{},a:{}};draw();
+</script><script>
+var fm='e',fper='w',fmv='',fmo='';
+var HD={sy:'2026 - 2027',lv:'Elementary',sn:'Potrero Elementary School',id:'136848',di:'IV',dv:'Malabon City',ad:'4 Pinagtipunan Circle, Brgy. Potrero, Malabon City',hd:'Elizabeth C. Aquino',s1m:'482',s1f:'474',s2m:'501',s2f:'455'};
+var YN=function(n,q){return {n:n,t:'yn',q:q}};
+var FQ=[{s:'B. Water Access'},
+{n:'1',t:'one',q:'Does the school provide drinking water?',o:['All the time','Yes, but supply is not regular','No drinking water in the school']},
+YN('2','Is the drinking water provided by the school for free?'),
+YN('3','Does the school coordinate with the LGU or water district to test the quality of water?'),
+{n:'4',t:'num',q:'How many times was the quality of water tested in the current calendar year?'},
+YN('5','Did the test result show that water is safe for drinking?'),
+{n:'6',t:'many',q:'What other mechanisms are used to ensure that drinking water in school is safe?',o:['Teachers ask the learners to bring their own drinking water to school','If from a refilling station, the school requires a water quality certificate','Water from an accessible water source is boiled','Water from an accessible water source is filtered','Others']},
+{n:'7',t:'one',q:'In the previous week, how often is water for daily handwashing and cleaning of toilets available in the school regardless of source?',o:['Available only on certain days of the week','Available daily but only in certain hours','Available daily for 24 hours']},
+{s:'C. Sanitation'},
+{n:'8',t:'t8',q:'How many toilet seats are available for children in the school? (galing sa Facilities)'},
+YN('9a','Are all functional toilets secure, private and have door with lock?'),
+YN('9b','Do all functional toilets have lighting (includes natural light or alternative sources)?'),
+YN('9c','Do all functional toilets have adequate ventilation?'),
+YN('10','Do all exclusively female toilets have wrapping materials and trash bins for used sanitary pads?'),
+{n:'11',t:'num',q:'How many exclusively female toilets have a washing facility inside the toilet?'},
+YN('12','Are detached toilets within view of school building and people?'),
+YN('13','Are there toilet/s designed for persons with limited mobility (ramp, railing, adequate space for a wheelchair)?'),
+{n:'14',t:'one',q:'How often is the sanitation facilities cleaned?',o:['Daily','Once a week','Less than once a week','At least twice a week']},
+YN('15','Does the school burn its waste?'),
+{n:'16',t:'many',q:'Are segregated trash bins with cover available in the following areas?',o:['Classrooms','Toilets','Canteens','Offices','Clinics','Play Areas','Gardens','Hallways','Gyms/Stage']},
+YN('17','Are the students segregating their solid waste properly?'),
+YN('18','Does the school have policies/sanctions which promote the practice of solid waste segregation?'),
+{n:'19',t:'one',q:'How regular is garbage being collected from the school?',o:['Daily','Once a week','2-3 times a week','Less than once a week','No Collection']},
+YN('20','Does the school have a compost pit for biodegradable waste?'),
+YN('21','Does the school have a refuse pit for non-biodegradable waste?'),
+YN('22','Does the school have a materials recovery facility (MRF)?'),
+YN('23','Do all toilets in the school have functional septic tank/s?'),
+YN('24','Does the school have a functional drainage from the kitchen and all wash areas to ensure that there is no stagnant water?'),
+YN('25','In the past year, did the school experience any floods?'),
+{n:'26',t:'one',q:'Did the school adopt the following mechanisms to address stagnant water?',o:['Pumping out of water','Filling of stagnant water','Soak pit','Treatment of stagnant water to prevent breeding of mosquitoes','Not applicable (e.g., no stagnant water because of sandy soil)']},
+YN('27','Does the school have a canteen?'),
+YN('28','Does the school canteen have a sanitary permit?'),
+{n:'29',t:'many',q:'Do food handlers practice the following food safety measures?',o:['Wearing of hairnet, gloves, masks and apron','Handwashing','Separate the storage of dry and wet food materials']},
+{n:'30',t:'ans',q:'Have all food handlers been oriented on food safety measures?'},
+{n:'31',t:'ans',q:'Do all food handlers in the school have health certificates?'},
+{s:'D. Hygiene'},
+{n:'32',t:'num',q:'How many times in a week is supervised group handwashing with soap conducted for all children? (0 if not done)'},
+{n:'33',t:'many',q:'What is the extent of student participation in supervising group handwashing?',o:['Students are participants supervised by teachers','There are students who assist teachers in supervising handwashing activities','There are students assigned to lead handwashing activities']},
+{n:'34',t:'t34',q:'How many handwashing facilities are available in your school? (galing sa Facilities)'},
+YN('35','Is there a regular supply of soap for handwashing?'),
+{n:'36',t:'many',q:'Are handwashing facilities available in the following areas?',o:['Classrooms','Toilets','Canteen/Eating Areas','Play areas','Agricultural areas (e.g., Gulayan, livestock area)','Clinics','Laboratories']},
+{n:'37',t:'many',q:'Do children perform individual handwashing during the following times?',o:['Before meals/eating/handling food','After using the toilet','After handling soil and animals','After cleaning activities/handling garbage','After playing']},
+{n:'38',t:'num',q:'How many times in a week is supervised group toothbrushing with fluoride conducted for all children? (0 if not done)'},
+{n:'39',t:'many',q:'What is the extent of student participation in supervising group toothbrushing?',o:['Students are participants supervised by teachers','Students assist teachers in supervising toothbrushing activities','Students are assigned to lead toothbrushing activities']},
+YN('40','For elementary schools, is there a regular supply of toothbrush and toothpaste for toothbrushing?'),
+{n:'41',t:'many',q:'Are the repair and maintenance requirements for WASH facilities reflected in the following?',o:['School improvement plan (SIP)','Annual improvement plan (AIP)']},
+{n:'42',t:'g',q:'What are the sources of funds for WASH facilities and supplies?',r:['Soap','Toothbrush','Toothpaste','Cleaning materials/supplies','Repair and maintenance (labor/spare parts)'],c:['School MOOE','Private/Individual Donations','PTA Funds','LGU Funds','Voluntary Donations from Internal Staff','Children Bring Their Own'],x:['4-5']},
+{n:'43',t:'many',q:'Where can learners avail of sanitary pads?',o:['School Canteen','School Clinic','Guidance Office','Class adviser/teacher Laboratories','Others']},
+YN('44','Is there information on proper disposal of sanitary napkins in the girls\u2019 toilet?'),
+YN('45','Are there DepEd Approved Instructional materials on Menstrual Health for Teachers?'),
+YN('46','Are there DepEd Approved IEC materials on Menstrual Health for Students?'),
+YN('47','Is there a designated rest space for girls with menstrual discomfort?'),
+{s:'E. Deworming'},YN('48','Is deworming done semi-annually?'),
+{n:'49',t:'num',q:'What is the total number of students dewormed?'},
+{s:'F. Health Education'},
+{n:'50',t:'g',q:'Which areas have IEC materials for WASH in Schools (WinS)?',r:['Bulletin board','Classrooms','Toilets','Handwashing facilities','Canteen/Eating areas'],c:['Hygiene','Menstrual Health Management','Sanitation','Food Safety'],x:['3-1','4-1']},
+YN('51','Are there organized structures (e.g., TWGs, student clubs) to promote WinS?'),
+YN('52','Is WinS a part of INSET?'),YN('53','Are learning materials available for teaching WinS?'),
+YN('54','Is WinS being advocated in the General PTA assembly?'),
+YN('55','Are there planned and organized activities for advocating WinS to parents/stakeholders?'),
+YN('56','Is WinS part of the co/extra-curricular program for students?')];
+function hv(k){var v=S.form.h[k];return v!==undefined?v:(HD[k]||'')}
+function inv(){var c=S.fac.filter(function(f){return f.kind==='cr'}),w=S.fac.filter(function(f){return f.kind==='hw'});
+ function n(s,ok){return c.filter(function(f){return f.sex===s&&(f.func!==false)===!!ok}).reduce(function(a,f){return a+Number(f.seats||0)},0)}
+ function g(x){var l=w.filter(function(f){return !!f.group===x});return [l.length,l.reduce(function(a,f){return a+Number(f.outlets||0)},0)]}
+ return {f:[n('M',1),n('F',1),n('S',1)],nf:[n('M',0),n('F',0),n('S',0)],i:g(false),g:g(true)}}
+function st(k,w){var y=0,t=0,ws={};DK().forEach(function(d){ws[wk(d)]=1;var v=S.days[d].g[k];if(v===undefined)return;t++;if(w?v==='24':v===1)y++});return {t:t,pc:t?y/t*100:0,pw:y/Math.max(1,Object.keys(ws).length)}}
+function stCl(){var cy=0,ct=0,ws={},c=S.fac.filter(function(f){return f.kind==='cr'});DK().forEach(function(d){ws[wk(d)]=1;var v=S.days[d].f||{},a=c.map(function(f){return v[f.id]}).filter(function(x){return x!==undefined});if(a.length){ct++;if(a.indexOf(0)<0)cy++}});return {t:ct,pc:ct?cy/ct*100:0,pw:cy/Math.max(1,Object.keys(ws).length)}}
+function sm(k){var t=0,x=0;DK().forEach(function(d){var v=S.days[d].g[k];if(typeof v!=='number')return;t++;x+=v});return {t:t,a:t?x/t:0}}
+function SG(n){var s;
+ if(n==='1'){s=st('dw');return s.t?(s.pc===100?0:1):undefined}
+ if(n==='7'){s=st('hw',1);return s.t?(s.pc===100?2:1):undefined}
+ if(n==='35'){s=st('sp');return s.t?(s.pc>=90?1:0):undefined}}
+function gk(q,r,c){return (S.form.a[q.n]||{})[r+'-'+c]}
+function txt(q,v){var I=inv();
+ if(q.t==='yn')return v===1?'Yes':v===0?'No':'\u2014';
+ if(q.t==='ans')return {A:'All',S:'Some',N:'None'}[v]||'\u2014';
+ if(q.t==='one')return v===undefined?'\u2014':q.o[v];
+ if(q.t==='many')return (v&&v.length)?v.map(function(i){return q.o[i]}).join('; '):'\u2014';
+ if(q.t==='num')return v===undefined?'\u2014':String(v);
+ if(q.t==='t8'){function s(a){return 'M '+a[0]+', F '+a[1]+', Shared '+a[2]+', Total '+(a[0]+a[1]+a[2])}return 'Functional: '+s(I.f)+' | Not functional: '+s(I.nf)}
+ if(q.t==='t34')return 'Individual: '+I.i[0]+' facilities, '+I.i[1]+' outlets | Group: '+I.g[0]+' facilities, '+I.g[1]+' outlets';
+ if(q.t==='g'){return q.r.map(function(r,ri){var l=q.c.filter(function(c,ci){return gk(q,ri,ci)});return r+': '+(l.length?l.join(', '):'\u2014')}).join(' | ')}}
+function cell(q,ri,ci){if(q.x.indexOf(ri+'-'+ci)>-1||(q.n==='42'&&ri===4&&ci===5))return '<td style="background:var(--ln)"></td>';
+ return '<td><button class="b '+(gk(q,ri,ci)?'p':'')+'" data-a="fc" data-q="'+q.n+'" data-r="'+ri+'" data-c="'+ci+'">'+(gk(q,ri,ci)?'\u2713':'\u00a0')+'</button></td>'}
+function qH(q){var a=S.form.a[q.n],h='<div class="card"><div class="q"><b>'+q.n+'.</b> '+q.q+'</div>',s=SG(q.n),k,i;
+ if(a===undefined&&s!==undefined)h+='<div class="sug">Mungkahi mula sa tracker: '+esc(txt(q,s))+' <button class="b" data-a="fu" data-q="'+q.n+'" data-v="'+s+'">Gamitin</button></div>';
+ if(q.t==='yn')h+='<div class="seg" style="justify-content:flex-start;margin-top:8px">'+seg2(q,a,[[1,'Yes'],[0,'No']])+'</div>';
+ else if(q.t==='ans')h+='<div class="seg" style="justify-content:flex-start;margin-top:8px">'+seg2(q,a,[['A','All'],['S','Some'],['N','None']])+'</div>';
+ else if(q.t==='one'){h+='<div style="margin-top:8px">';q.o.forEach(function(o,i){h+='<button class="b ob '+(a===i?'p':'')+'" data-a="fa" data-q="'+q.n+'" data-v="'+i+'">'+esc(o)+'</button>'});h+='</div>'}
+ else if(q.t==='many'){h+='<div style="margin-top:8px">';q.o.forEach(function(o,i){h+='<button class="b ob '+((a||[]).indexOf(i)>-1?'p':'')+'" data-a="fm" data-q="'+q.n+'" data-v="'+i+'">'+esc(o)+'</button>'});h+='</div>'}
+ else if(q.t==='num')h+='<input type="number" min="0" data-fq="'+q.n+'" value="'+(a===undefined?'':a)+'" style="margin-top:8px;width:120px">';
+ else if(q.t==='g'){h+='<div style="overflow-x:auto;margin-top:8px"><table><tr><th></th>'+q.c.map(function(c){return '<th>'+c+'</th>'}).join('')+'</tr>'+q.r.map(function(r,ri){return '<tr><th>'+r+'</th>'+q.c.map(function(c,ci){return cell(q,ri,ci)}).join('')+'</tr>'}).join('')+'</table></div>'}
+ else h+='<div class="sug" style="margin-top:8px">'+esc(txt(q))+'</div>';
+ return h+'</div>'}
+function seg2(q,a,o){return o.map(function(x){return '<button class="b '+(a===x[0]?'p':'')+'" data-a="fa" data-q="'+q.n+'" data-v="'+x[0]+'">'+x[1]+'</button>'}).join('')}
+function fi(k,l,t){return '<div><p class="lbl">'+l+'</p><input data-fh="'+k+'" '+(t||'')+' value="'+esc(hv(k))+'"></div>'}
+function formEdit(){var h='<h2>A. School Profile</h2><div class="card"><div class="g">'+fi('dt','Date','type="date"')+fi('sy','School Year')+'</div><div class="seg" style="justify-content:flex-start;margin-bottom:8px"><button class="b '+(hv('lv')==='Elementary'?'p':'')+'" data-a="fl" data-v="Elementary">Elementary</button><button class="b '+(hv('lv')==='Secondary'?'p':'')+'" data-a="fl" data-v="Secondary">Secondary</button></div><div class="g">'+fi('sn','School Name')+fi('id','School ID')+fi('di','District')+fi('dv','Division')+fi('hd','Name of School Head')+fi('ct','Contact No.')+'</div>'+fi('ad','Complete School Address')+'<p class="lbl" style="margin-top:10px">Total Enrolment</p><div class="g">'+fi('s1m','Shift 1 Male','type="number"')+fi('s1f','Shift 1 Female','type="number"')+fi('s2m','Shift 2 Male','type="number"')+fi('s2f','Shift 2 Female','type="number"')+fi('s3m','Shift 3 Male','type="number"')+fi('s3f','Shift 3 Female','type="number"')+'</div></div>';
+ var done=0,tot=0;FQ.forEach(function(q){if(!q.n)return;tot++;var a=S.form.a[q.n];if(q.t==='t8'||q.t==='t34'?S.fac.length:q.t==='g'?a&&Object.keys(a).some(function(k){return a[k]}):(a!==undefined&&!(a.length===0)))done++});
+ h+='<div class="prog">'+done+' / '+tot+' ang nasagot</div>';
+ FQ.forEach(function(q){h+=q.s?'<h2>'+q.s+'</h2>':qH(q)});
+ h+='<h2>Pirmahan</h2><div class="card"><p class="lbl">TWG Members (printed name)</p>'+fi('w1','1')+fi('w2','2')+fi('w3','3')+fi('w4','4')+'<div class="g" style="margin-top:8px">'+fi('pt','Position Title (School Head)')+fi('sd','Date','type="date"')+'</div></div>';
+ return h}
+function DK(){return Object.keys(S.days).filter(function(d){return !fmo||d.slice(0,7)===fmo})}
+function mon(ym){var M=['January','February','March','April','May','June','July','August','September','October','November','December'];return M[+ym.slice(5,7)-1]+' '+ym.slice(0,4)}
+function fctl(){return '<div class="noprint" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0"><div class="seg"><button class="y '+(fper==='w'?'on':'')+'" data-a="fper" data-v="w">Linggo</button><button class="y '+(fper==='m'?'on':'')+'" data-a="fper" data-v="m">Buwan</button></div>'+(fper==='m'?'<input type="month" id="fmo" style="width:auto" value="'+(fmv||cur.slice(0,7))+'">':'')+'</div>'}
+function wle(w){var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],a=new Date(w+'T00:00:00'),b=new Date(a);b.setDate(b.getDate()+6);return M[a.getMonth()]+' '+a.getDate()+' \u2013 '+(a.getMonth()!==b.getMonth()?M[b.getMonth()]+' ':'')+b.getDate()+', '+b.getFullYear()}
+function repLines(){var L=[],F=S.form;L.push('DEPARTMENT OF EDUCATION \u2014 WASH IN SCHOOLS (WinS) MONITORING FORM');
+ L.push((fper==='m'?'Month: '+mon(fmv||cur.slice(0,7)):'Week: '+wle(cur))+' | School Year: '+hv('sy')+' | Level: '+hv('lv'));L.push('School: '+hv('sn')+' | School ID: '+hv('id')+' | District: '+hv('di')+' | Division: '+hv('dv'));
+ L.push('Address: '+hv('ad'));L.push('School Head: '+hv('hd')+' | Contact: '+hv('ct'));
+ var tm=0,tf=0;['s1','s2','s3'].forEach(function(s){var m=+hv(s+'m')||0,f=+hv(s+'f')||0;tm+=m;tf+=f;L.push('Enrolment '+s.replace('s','Shift ')+': Male '+(m||'')+', Female '+(f||'')+', Total '+(m+f||''))});
+ FQ.forEach(function(q){if(q.s)L.push('['+q.s+']');else L.push(q.n+'. '+q.q+' \u2192 '+txt(q,F.a[q.n]))});
+ L.push('TWG Members: '+[1,2,3,4].map(function(i){return hv('w'+i)}).filter(Boolean).join(', '));L.push('School Head position: '+hv('pt')+' | Date: '+hv('sd'));return L}
+function formRep(){fmo=fper==='m'?(fmv||cur.slice(0,7)):'';var L=repLines(),h='<div class="noprint"><button class="b p" data-a="print">\ud83d\udda8 I-print</button> <button class="b p" data-a="pdf">\u2b07 I-download bilang PDF</button></div>'+fctl()+'<div class="pr">'+statsH()+'</div><div class="card rep" style="margin-top:10px">';
+ var i0=0;while(i0<L.length&&!/^\[/.test(L[i0]))i0++;
+ h+='<div class="fh"><div class="ft">'+esc(L[0]||'')+'</div>'+L.slice(1,i0).map(function(l){return '<div class="fi">'+esc(l)+'</div>'}).join('')+'</div>';
+ L.slice(i0).forEach(function(l){if(/^\[/.test(l)){h+='<h2 class="fs">'+esc(l.slice(1,-1))+'</h2>';return}
+  var m=l.match(/^(\d+[a-z]?)\.\s+([\s\S]*?)\s*\u2192\s*([\s\S]*)$/);
+  if(m&&(m[1]==='8'||m[3].indexOf(' | ')>-1))return;
+  if(m){var e=/^[\u2014\-\s]*$/.test(m[3]);h+='<div class="fr"><span class="qn">'+esc(m[1])+'</span><span class="qt">'+esc(m[2])+'</span><span class="qa'+(e?' e':'')+'">'+(e?'\u2014':esc(m[3]))+'</span></div>'}
+  else h+='<div class="fr"><span class="qt">'+esc(l)+'</span></div>'});
+ fmo='';return h+'</div><div class="card noprint"><p class="lbl">Kopyahin lahat ng nasa baba at i-send sa akin para magawan ko ng filled na Word form.</p><textarea rows="8" readonly>'+esc(L.join('\n'))+'</textarea></div>'}
+function viewForm(){S.form=S.form||{};S.form.h=S.form.h||{};S.form.a=S.form.a||{};
+ return '<div class="seg noprint" style="justify-content:flex-start;margin-bottom:10px"><button class="b '+(fm==='e'?'p':'')+'" data-a="fmode" data-v="e">Sagutan</button><button class="b '+(fm==='r'?'p':'')+'" data-a="fmode" data-v="r">Report</button></div>'+(fm==='r'?formRep():formEdit())}
+function nv(v){return /^\d+$/.test(v)?Number(v):v}
+document.addEventListener('click',function(e){var b=e.target.closest('button[data-a]');if(!b)return;var a=b.getAttribute('data-a'),q=b.getAttribute('data-q'),v=b.getAttribute('data-v');if(!S.form)return;var A=S.form.a;
+ if(a==='fmode'){fm=v;draw()}
+ else if(a==='fper'){fper=v;draw()}
+ else if(a==='fa'){v=nv(v);if(A[q]===v)delete A[q];else A[q]=v;save();draw()}
+ else if(a==='fu'){A[q]=nv(v);save();draw()}
+ else if(a==='fm'){var l=A[q]||[],i=+v,p=l.indexOf(i);if(p>-1)l.splice(p,1);else l.push(i);A[q]=l;save();draw()}
+ else if(a==='fc'){var o=A[q]||{},k=b.getAttribute('data-r')+'-'+b.getAttribute('data-c');o[k]=!o[k];A[q]=o;save();draw()}
+ else if(a==='fl'){S.form.h.lv=v;save();draw()}
+});
+document.addEventListener('change',function(e){var t=e.target;if(!S.form)return;
+ if(t.id==='fmo'){fmv=t.value;draw()}
+ else if(t.getAttribute('data-fq')){var q=t.getAttribute('data-fq');if(t.value==='')delete S.form.a[q];else S.form.a[q]=Number(t.value);save();draw()}
+ else if(t.getAttribute('data-fh')){S.form.h[t.getAttribute('data-fh')]=t.value;save()}
+});
+</script>
+</body></html>
